@@ -1,10 +1,15 @@
-import { useState } from 'react';
-import { MessageCircle, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { MessageCircle, X, Send } from 'lucide-react';
 
 const WHATSAPP_NUMBER = '5543984111736';
-const WHATSAPP_MESSAGE = 'Olá, vim pelo site da Engethermo e gostaria de falar com um especialista.';
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 const ICON_URL = '/images/icon-et-cropped_9f642670.png';
+
+const buildWhatsAppLink = (text?: string) => {
+  const message = text?.trim()
+    ? `Olá, vim pelo site da Engethermo. ${text.trim()}`
+    : 'Olá, vim pelo site da Engethermo e gostaria de falar com um especialista.';
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+};
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -12,8 +17,50 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+const WELCOME: Message = {
+  id: 'welcome',
+  role: 'assistant',
+  content: 'Bem-vindo à Engethermo Engenharia. Como podemos ajudar?',
+};
+
+const HANDOFF_TEXT =
+  'Agradecemos o seu contato com a Engethermo Engenharia. Para oferecer um atendimento mais preciso e personalizado, convidamos você a falar diretamente com um de nossos especialistas pelo WhatsApp. Basta clicar no botão abaixo.';
+
 export default function AIChatAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([WELCOME]);
+  const [input, setInput] = useState('');
+  const [sentText, setSentText] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, sentText]);
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text || sentText !== null) return;
+
+    setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: 'user', content: text }]);
+    setInput('');
+    setSentText(text);
+
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { id: `a-${Date.now()}`, role: 'assistant', content: HANDOFF_TEXT },
+      ]);
+    }, 600);
+  };
+
+  const handoffShown = messages.some((m) => m.content === HANDOFF_TEXT);
 
   return (
     <>
@@ -32,16 +79,12 @@ export default function AIChatAssistant() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-32px)] bg-[#1d1c1e] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-32px)] h-[520px] bg-[#1d1c1e] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-300">
           {/* Header */}
           <div className="bg-gradient-to-r from-red-800 via-red-700 to-red-800 text-white px-4 py-3 flex items-center justify-between gap-3 border-b border-red-900/60 shadow-lg">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <img
-                  src={ICON_URL}
-                  alt="ENGETHERMO"
-                  className="w-9 h-9 object-contain"
-                />
+                <img src={ICON_URL} alt="ENGETHERMO" className="w-9 h-9 object-contain" />
               </div>
               <div className="leading-tight">
                 <h3 className="font-bold text-sm tracking-widest uppercase">Engethermo</h3>
@@ -57,28 +100,62 @@ export default function AIChatAssistant() {
             </button>
           </div>
 
-          {/* Message */}
-          <div className="px-4 py-5 bg-[#1d1c1e] space-y-4">
-            <div className="bg-[#262626] text-gray-100 border border-gray-700/60 rounded-xl rounded-bl-sm px-4 py-3 shadow-sm">
-              <p className="text-[13px] leading-relaxed">
-                Agradecemos o seu contato com a Engethermo Engenharia.
-              </p>
-              <p className="text-[13px] leading-relaxed mt-2">
-                Para oferecer um atendimento mais preciso e personalizado, convidamos você a falar
-                diretamente com um de nossos especialistas pelo WhatsApp. Basta clicar no botão
-                abaixo.
-              </p>
-            </div>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5 bg-[#1d1c1e] custom-scrollbar">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[85%] px-3 py-2 rounded-xl text-[12.5px] leading-relaxed ${
+                    message.role === 'user'
+                      ? 'bg-red-600 text-white rounded-br-sm shadow-md'
+                      : 'bg-[#262626] text-gray-100 border border-gray-700/60 rounded-bl-sm shadow-sm'
+                  }`}
+                >
+                  {message.content}
+                </div>
+              </div>
+            ))}
 
-            <a
-              href={WHATSAPP_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 bg-green-600 hover:bg-green-700 text-white text-[13px] font-semibold rounded-lg shadow-md transition-colors"
-            >
-              <WhatsAppIcon className="w-5 h-5" />
-              Falar com um especialista
-            </a>
+            {handoffShown && (
+              <div className="flex justify-start">
+                <a
+                  href={buildWhatsAppLink(sentText ?? undefined)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-[12.5px] font-semibold rounded-lg shadow-md transition-colors"
+                >
+                  <WhatsAppIcon className="w-4 h-4" />
+                  Falar com um especialista
+                </a>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div className="border-t border-gray-800 px-3 py-3 bg-[#1d1c1e]">
+            <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={sentText ? 'Continue pelo WhatsApp' : 'Digite sua mensagem...'}
+                className="flex-1 px-3 py-2 bg-[#262626] border border-gray-700 text-white text-[12.5px] rounded-lg focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 placeholder-gray-500 transition-all disabled:opacity-50"
+                disabled={sentText !== null}
+              />
+              <button
+                type="submit"
+                disabled={sentText !== null || !input.trim()}
+                className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-md flex items-center justify-center"
+                aria-label="Enviar"
+              >
+                <Send className="w-4 h-4" strokeWidth={2.5} />
+              </button>
+            </form>
           </div>
         </div>
       )}
