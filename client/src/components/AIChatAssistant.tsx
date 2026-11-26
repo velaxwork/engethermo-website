@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 
 const WHATSAPP_NUMBER = '5543984111736';
-const ICON_URL = '/images/icon-et-cropped_9f642670.png';
+const ICON_URL = '/images/icon-et-cropped_9f642670.webp';
 
 const buildWhatsAppLink = (text?: string) => {
   const message = text?.trim()
