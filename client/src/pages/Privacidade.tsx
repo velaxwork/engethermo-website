@@ -52,9 +52,9 @@ export default function Privacidade() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-white mb-3">3. Assistente de IA</h2>
+            <h2 className="text-xl font-semibold text-white mb-3">3. Chat de atendimento</h2>
             <p>
-              Nosso site disponibiliza um assistente virtual baseado em inteligência artificial para responder dúvidas sobre nossos serviços. As mensagens enviadas ao assistente são processadas por um modelo de linguagem para gerar respostas. Não armazenamos o histórico de conversas de forma permanente nem associamos as mensagens a identidades pessoais.
+              O chat do nosso site não armazena as mensagens digitadas nem as envia a servidores da ENGETHERMO. O texto escrito pelo visitante é usado apenas para preencher a mensagem inicial da conversa no WhatsApp, que só é iniciada se o visitante clicar no botão de atendimento. A partir desse momento, aplica-se a Política de Privacidade do WhatsApp/Meta.
             </p>
           </section>
 

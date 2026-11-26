@@ -56,9 +56,9 @@ export default function Termos() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-white mb-3">4. Assistente virtual de IA</h2>
+            <h2 className="text-xl font-semibold text-white mb-3">4. Chat de atendimento</h2>
             <p>
-              O assistente virtual disponível neste site utiliza inteligência artificial para fornecer informações gerais sobre os serviços da ENGETHERMO. As respostas geradas têm caráter meramente informativo e não constituem proposta comercial, contrato ou garantia de serviço. Para orçamentos e contratações, o contato deve ser realizado diretamente com nossa equipe via WhatsApp.
+              O chat disponível neste site serve para encaminhar o visitante ao atendimento da ENGETHERMO. Ao enviar uma mensagem no chat, o visitante é direcionado ao WhatsApp para conversar diretamente com nossa equipe. Orçamentos, prazos e condições de contratação são tratados exclusivamente por essa equipe, e as informações exibidas no site têm caráter meramente informativo, sem constituir proposta comercial, contrato ou garantia de serviço.
             </p>
           </section>
 
